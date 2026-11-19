@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artesanía Hextech // Botín Mítico para Lia</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Cinzel (Estilo Beaufort LoL) e Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --lol-bg-deep: #1A0510;
+            --lol-bg-navy: #2D0A1C;
+            --lol-gold-light: #F0E6D2;
+            --lol-gold: #C8AA6E;
+            --lol-gold-mid: #C89B3C;
+            --lol-gold-dark: #785A28;
+            --lol-pink-light: #FFB6C1;
+            --lol-pink: #FF69B4;
+            --lol-pink-dark: #C71585;
+            --lol-mythic: #FF1493;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--lol-bg-deep);
+            color: var(--lol-gold-light);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 50% 25%, rgba(255, 105, 180, 0.12) 0%, transparent 55%),
+                radial-gradient(circle at 50% 85%, rgba(255, 20, 147, 0.1) 0%, transparent 50%),
+                linear-gradient(180deg, #1A0510 0%, #2D0A1C 50%, #1A0510 100%);
+        }
+
+        .font-lol {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.06em;
+        }
+
+        /* Marco Principal Estilo Cliente Hextech */
+        .hextech-panel {
+            background: linear-gradient(180deg, rgba(9, 20, 40, 0.92) 0%, rgba(1, 10, 19, 0.96) 100%);
+            border: 2px solid var(--lol-gold-dark);
+            box-shadow: 
+                0 0 40px rgba(0, 0, 0, 0.9),
+                inset 0 0 25px rgba(255, 105, 180, 0.08),
+                0 0 15px rgba(200, 170, 110, 0.15);
+            position: relative;
+        }
+
+        .hextech-panel::before {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border: 1px solid rgba(200, 170, 110, 0.3);
+            pointer-events: none;
+        }
+
+        /* Esquinas geométricas doradas */
+        .corner-ornament {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-color: var(--lol-gold);
+            pointer-events: none;
+            z-index: 10;
+        }
+        .corner-tl { top: -2px; left: -2px; border-top: 3px solid var(--lol-gold); border-left: 3px solid var(--lol-gold); }
+        .corner-tr { top: -2px; right: -2px; border-top: 3px solid var(--lol-gold); border-right: 3px solid var(--lol-gold); }
+        .corner-bl { bottom: -2px; left: -2px; border-bottom: 3px solid var(--lol-gold); border-left: 3px solid var(--lol-gold); }
+        .corner-br { bottom: -2px; right: -2px; border-bottom: 3px solid var(--lol-gold); border-right: 3px solid var(--lol-gold); }
+
+        /* Botón Hextech Oficial */
+        .btn-hextech {
+            background: linear-gradient(180deg, #1E2328 0%, #13181D 100%);
+            border: 2px solid var(--lol-gold);
+            color: var(--lol-gold-light);
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            position: relative;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 0 12px rgba(200, 170, 110, 0.2), inset 0 0 10px rgba(200, 170, 110, 0.1);
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .btn-hextech:hover:not(:disabled) {
+            background: linear-gradient(180deg, #2D0A1C 0%, #1A0510 100%);
+            border-color: var(--lol-gold-light);
+            color: #FFFFFF;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.5), inset 0 0 15px rgba(255, 105, 180, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .btn-hextech:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        .btn-hextech-pink {
+            background: linear-gradient(180deg, #3D0E26 0%, #2D0A1C 100%);
+            border: 2px solid var(--lol-pink);
+            color: var(--lol-pink-light);
+            box-shadow: 0 0 18px rgba(255, 105, 180, 0.35), inset 0 0 12px rgba(255, 105, 180, 0.2);
+        }
+
+        .btn-hextech-pink:hover:not(:disabled) {
+            background: linear-gradient(180deg, #5C153A 0%, #3D0E26 100%);
+            border-color: #FFFFFF;
+            box-shadow: 0 0 28px rgba(255, 105, 180, 0.75), inset 0 0 18px rgba(255, 105, 180, 0.4);
+        }
+
+        /* Opciones de Trivia */
+        .quiz-option {
+            background: linear-gradient(90deg, rgba(30, 35, 40, 0.85) 0%, rgba(15, 23, 34, 0.85) 100%);
+            border: 1px solid var(--lol-gold-dark);
+            border-left: 4px solid var(--lol-gold);
+            color: var(--lol-gold-light);
+            transition: all 0.2s ease;
+            text-align: left;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .quiz-option:hover:not(:disabled) {
+            background: linear-gradient(90deg, rgba(255, 105, 180, 0.18) 0%, rgba(30, 35, 40, 0.9) 100%);
+            border-color: var(--lol-pink);
+            border-left-width: 6px;
+            padding-left: 1.25rem;
+            box-shadow: 0 0 15px rgba(255, 105, 180, 0.2);
+        }
+
+        .quiz-option.correct {
+            background: linear-gradient(90deg, rgba(255, 105, 180, 0.35) 0%, rgba(5, 46, 36, 0.9) 100%) !important;
+            border-color: #4ADE80 !important;
+            border-left-color: #4ADE80 !important;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.4) !important;
+        }
+
+        .quiz-option.wrong {
+            background: linear-gradient(90deg, rgba(239, 68, 68, 0.35) 0%, rgba(45, 12, 18, 0.9) 100%) !important;
+            border-color: #EF4444 !important;
+            border-left-color: #EF4444 !important;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        @keyframes screen-shake {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            15% { transform: translate(-6px, -4px) rotate(-1deg); }
+            30% { transform: translate(6px, 4px) rotate(1deg); }
+            45% { transform: translate(-5px, 5px) rotate(-0.5deg); }
+            60% { transform: translate(5px, -5px) rotate(0.5deg); }
+            75% { transform: translate(-3px, 2px) rotate(0deg); }
+        }
+
+        .animate-screen-shake {
+            animation: screen-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+
+        /* Animaciones del Cofre Maestro */
+        @keyframes float-hextech {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .chest-float {
+            animation: float-hextech 3.5s ease-in-out infinite;
+        }
+
+        .hextech-ring-spin {
+            animation: spin 18s linear infinite;
+        }
+        .hextech-ring-spin-reverse {
+            animation: spin-rev 12s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes spin-rev {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+
+        /* Fragmentos de Llave */
+        .fragment-slot {
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .fragment-slot.unlocked {
+            filter: drop-shadow(0 0 12px rgba(255, 105, 180, 0.85));
+            transform: scale(1.08);
+        }
+
+        /* Carta de Botín Mítico */
+        .mythic-card {
+            background: linear-gradient(160deg, #2D0A1C 0%, #1A0510 50%, #0F0208 100%);
+            border: 2px solid var(--lol-gold);
+            box-shadow: 0 0 35px rgba(255, 20, 147, 0.45), inset 0 0 25px rgba(255, 105, 180, 0.15);
+        }
+
+        /* Destello / Flash Particle Puff */
+        .flash-puff {
+            position: fixed;
+            pointer-events: none;
+            width: 90px;
+            height: 90px;
+            margin-left: -45px;
+            margin-top: -45px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #FFF9C4 0%, #FFD54F 40%, rgba(200, 170, 110, 0) 75%);
+            z-index: 9999;
+            animation: flash-burst 0.55s ease-out forwards;
+        }
+
+        @keyframes flash-burst {
+            0% { transform: scale(0.3); opacity: 1; filter: brightness(2); }
+            60% { transform: scale(1.4); opacity: 0.8; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #010A13;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #785A28;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #C8AA6E;
+        }
+
+        #white-flash-overlay {
+            pointer-events: none;
+            transition: opacity 0.8s ease-out;
+        }
+
+        /* Estilos limpios al imprimir o guardar como PDF el certificado */
+        @media print {
+            body {
+                background: #1A0510 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            header, footer, #hextech-canvas, .no-print {
+                display: none !important;
+            }
+            #stage-victory {
+                box-shadow: none !important;
+                margin: 0 auto !important;
+            }
+        }
+    </style>
+</head>
+<body class="relative flex flex-col justify-between min-h-screen">
+
+    <!-- Fondo de Partículas Hextech -->
+    <canvas id="hextech-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    <!-- Overlay de Explosión al Abrir el Cofre -->
+    <div id="white-flash-overlay" class="fixed inset-0 z-50 bg-gradient-to-b from-pink-200 via-amber-100 to-pink-400 opacity-0"></div>
+
+    <!-- BARRA SUPERIOR DEL CLIENTE DE LEAGUE OF LEGENDS -->
+    <header class="relative z-20 w-full border-b border-[#785A28]/70 bg-[#1A0510]/90 backdrop-blur-md px-4 py-2.5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full border-2 border-[#C8AA6E] bg-[#2D0A1C] flex items-center justify-center shadow-[0_0_10px_rgba(255,105,180,0.4)]">
+                <svg class="w-5 h-5 text-[#FF69B4]" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L3 7v10l9 5 9-5V7l-9-5zm0 2.3l6.9 3.8v7.8L12 19.7 5.1 15.9V8.1L12 4.3zm0 2.7l-4.5 2.5v5L12 17l4.5-2.5v-5L12 7z"/>
+                </svg>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="font-lol text-xs md:text-sm font-bold tracking-widest text-[#F0E6D2]">BOTÍN HEXTECH</span>
+                    <span class="text-[10px] px-1.5 py-0.5 bg-pink-950/90 border border-pink-400/50 text-pink-200 rounded font-semibold">EDICIÓN MÍTICA 💖</span>
+                </div>
+                <p class="text-[11px] text-[#C8AA6E] hidden sm:block">Cliente Oficial de Propuesta // Invocadora: <strong class="text-[#FF69B4]">Lia</strong></p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-4">
+            <div class="hidden md:flex items-center gap-1.5 bg-[#2D0A1C] border border-[#785A28] px-2.5 py-1 rounded text-xs" title="Esencia Mítica Borahae (BTS)">
+                <span class="text-pink-400">💖</span>
+                <span class="font-lol text-[#F0E6D2] font-bold">777</span>
+                <span class="text-[10px] text-[#C8AA6E]">EM</span>
+            </div>
+            <div class="hidden md:flex items-center gap-1.5 bg-[#2D0A1C] border border-[#785A28] px-2.5 py-1 rounded text-xs" title="Fragmentos de Hyrule & Dream Land">
+                <span class="text-amber-400">🔺</span>
+                <span class="font-lol text-[#F0E6D2] font-bold">9999</span>
+                <span class="text-pink-400">⭐</span>
+            </div>
+
+            <button id="mute-btn" onclick="toggleAudio()" class="btn-hextech px-2.5 py-1.5 text-xs flex items-center gap-1 rounded" title="Activar/Silenciar Efectos de Sonido Hextech">
+                <span id="audio-icon">🔊</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR CENTRAL DE LAS 4 ETAPAS -->
+    <main id="main-stage-wrapper" class="relative z-10 flex-1 flex items-center justify-center p-3 sm:p-6">
+
+        <!-- ==========================================
+             ETAPA 1: FORJA DE LLAVE MÍTICA (TRIVIA)
+             ========================================== -->
+        <section id="stage-1" class="hextech-panel w-full max-w-3xl p-5 sm:p-8 rounded-sm transition-all duration-500">
+            <div class="corner-ornament corner-tl"></div>
+            <div class="corner-ornament corner-tr"></div>
+            <div class="corner-ornament corner-bl"></div>
+            <div class="corner-ornament corner-br"></div>
+
+            <div class="text-center border-b border-[#785A28]/60 pb-4 mb-6">
+                <p class="text-[11px] uppercase tracking-[0.25em] text-[#FF69B4] font-semibold mb-1">ARTESANÍA HEXTECH // FORJA DE LLAVE MÍTICA PARA LIA</p>
+                <h1 class="font-lol text-xl sm:text-3xl font-extrabold text-[#F0E6D2] drop-shadow-[0_2px_10px_rgba(200,170,110,0.4)]">
+                    REÚNE LOS 3 FRAGMENTOS DE LLAVE
+                </h1>
+                <p class="text-xs sm:text-sm text-[#C8AA6E] mt-1 max-w-xl mx-auto">
+                    Para desbloquear el <span class="text-[#F0E6D2] font-medium">Cofre Maestro de Dúo</span>, responde estas 3 misiones especiales y forja la Llave Hextech Definitiva.
+                </p>
+            </div>
+
+            <!-- Barra Visual de los 3 Fragmentos de Llave -->
+            <div class="grid grid-cols-3 gap-2 sm:gap-4 mb-6 bg-[#1A0510]/80 border border-[#785A28]/50 p-3 sm:p-4 rounded">
+                <div id="frag-slot-0" class="fragment-slot flex flex-col items-center text-center p-2 rounded border border-transparent">
+                    <div id="frag-icon-0" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-[#785A28] bg-[#2D0A1C] flex items-center justify-center mb-1.5 opacity-40 transition-all duration-500">
+                        <svg class="w-7 h-7 text-amber-400" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 3L7.5 11h9L12 3zm-4.5 9L3 20h9l-4.5-8zm9 0L12 20h9l-4.5-8z"/>
+                        </svg>
+                    </div>
+                    <span class="font-lol text-[10px] sm:text-xs font-bold text-[#F0E6D2]">FRAGMENTO I</span>
+                    <span class="text-[10px] text-[#C8AA6E]">Trifuerza de Hyrule</span>
+                    <span id="frag-status-0" class="text-[9px] uppercase tracking-wider mt-1 px-2 py-0.5 rounded bg-slate-800 text-slate-400">Bloqueado</span>
+                </div>
+
+                <div id="frag-slot-1" class="fragment-slot flex flex-col items-center text-center p-2 rounded border border-transparent">
+                    <div id="frag-icon-1" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-[#785A28] bg-[#2D0A1C] flex items-center justify-center mb-1.5 opacity-40 transition-all duration-500">
+                        <svg class="w-7 h-7 text-pink-400" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    </div>
+                    <span class="font-lol text-[10px] sm:text-xs font-bold text-[#F0E6D2]">FRAGMENTO II</span>
+                    <span class="text-[10px] text-[#C8AA6E]">Estrella Poyo ✨</span>
+                    <span id="frag-status-1" class="text-[9px] uppercase tracking-wider mt-1 px-2 py-0.5 rounded bg-slate-800 text-slate-400">Bloqueado</span>
+                </div>
+
+                <div id="frag-slot-2" class="fragment-slot flex flex-col items-center text-center p-2 rounded border border-transparent">
+                    <div id="frag-icon-2" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-[#785A28] bg-[#2D0A1C] flex items-center justify-center mb-1.5 opacity-40 transition-all duration-500">
+                        <svg class="w-7 h-7 text-pink-400" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </div>
+                    <span class="font-lol text-[10px] sm:text-xs font-bold text-[#F0E6D2]">FRAGMENTO III</span>
+                    <span class="text-[10px] text-[#C8AA6E]">Cristal Borahae 💖</span>
+                    <span id="frag-status-2" class="text-[9px] uppercase tracking-wider mt-1 px-2 py-0.5 rounded bg-slate-800 text-slate-400">Bloqueado</span>
+                </div>
+            </div>
+
+            <!-- Caja de Pregunta Activa -->
+            <div id="quiz-box" class="bg-[#1A0510]/90 border border-[#C8AA6E]/40 p-4 sm:p-6 rounded relative">
+                <div class="flex items-center justify-between text-xs text-[#FF69B4] mb-2">
+                    <span id="question-counter" class="font-lol font-bold tracking-wider">MISIÓN DE FORJA 1 DE 3</span>
+                    <span id="question-tag" class="text-[#C8AA6E] italic">Recompensa: Fragmento de Llave Hextech</span>
+                </div>
+
+                <h2 id="question-title" class="font-lol text-base sm:text-xl text-[#F0E6D2] font-bold mb-4 leading-snug">
+                    Cargando misión...
+                </h2>
+
+                <div id="options-list" class="grid grid-cols-1 gap-2.5"></div>
+                <div id="quiz-feedback" class="mt-4 min-h-[24px] text-xs sm:text-sm font-medium text-center transition-all"></div>
+            </div>
+        </section>
+
+
+        <!-- ==========================================
+             ETAPA 2: APERTURA DEL COFRE MAESTRO HEXTECH
+             ========================================== -->
+        <section id="stage-2" class="hidden hextech-panel w-full max-w-2xl p-6 sm:p-10 rounded-sm text-center">
+            <div class="corner-ornament corner-tl"></div>
+            <div class="corner-ornament corner-tr"></div>
+            <div class="corner-ornament corner-bl"></div>
+            <div class="corner-ornament corner-br"></div>
+
+            <p class="text-xs uppercase tracking-[0.25em] text-[#FF69B4] font-semibold mb-1">¡LLAVE MÍTICA FORJADA CON ÉXITO!</p>
+            <h2 class="font-lol text-2xl sm:text-3xl font-extrabold text-[#F0E6D2] mb-2">
+                COFRE DE ARTESANÍA MAESTRA
+            </h2>
+            <p class="text-xs sm:text-sm text-[#C8AA6E] max-w-md mx-auto mb-6">
+                Contiene un botín único reservado exclusivamente para <strong class="text-[#F0E6D2]">Lia</strong>. Sobrecarga el núcleo Hextech con 3 toques para abrirlo.
+            </p>
+
+            <!-- Escena Visual del Cofre Hextech -->
+            <div class="relative w-64 h-64 sm:w-72 sm:h-72 mx-auto flex items-center justify-center my-2">
+                <svg class="absolute inset-0 w-full h-full hextech-ring-spin opacity-60 pointer-events-none" viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="#FF69B4" stroke-width="1.5" stroke-dasharray="12 8 4 8" />
+                    <circle cx="100" cy="100" r="78" fill="none" stroke="#C8AA6E" stroke-width="1" stroke-dasharray="30 15" />
+                    <polygon points="100,6 105,16 95,16" fill="#FF69B4" />
+                    <polygon points="100,194 105,184 95,184" fill="#FF69B4" />
+                    <polygon points="6,100 16,105 16,95" fill="#C8AA6E" />
+                    <polygon points="194,100 184,105 184,95" fill="#C8AA6E" />
+                </svg>
+
+                <svg class="absolute inset-4 w-[calc(100%-2rem)] h-[calc(100%-2rem)] hextech-ring-spin-reverse opacity-45 pointer-events-none" viewBox="0 0 200 200">
+                    <polygon points="100,20 170,60 170,140 100,180 30,140 30,60" fill="none" stroke="#FF1493" stroke-width="1.5" stroke-dasharray="10 6" />
+                </svg>
+
+                <div id="chest-aura" class="absolute w-44 h-44 rounded-full bg-pink-500/20 blur-2xl transition-all duration-500"></div>
+
+                <div id="hextech-chest-svg" onclick="hitChest()" class="relative z-10 cursor-pointer chest-float transition-transform duration-200 hover:scale-105" title="Haz clic para sobrecargar el Cofre Hextech">
+                    <svg class="w-48 h-48 sm:w-56 sm:h-56 drop-shadow-[0_10px_25px_rgba(255,105,180,0.45)]" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <ellipse cx="100" cy="175" rx="65" ry="12" fill="rgba(0,0,0,0.65)" />
+                        <path d="M35 95 L165 95 L155 162 L45 162 Z" fill="#2D0A1C" stroke="#C8AA6E" stroke-width="4" />
+                        <path d="M48 102 L152 102 L144 154 L56 154 Z" fill="#1A0510" stroke="#785A28" stroke-width="2" />
+                        <path id="chest-vein-1" d="M55 110 L75 148 M145 110 L125 148" stroke="#FF69B4" stroke-width="3" stroke-linecap="round" opacity="0.6" />
+                        <path d="M30 95 L48 52 L152 52 L170 95 Z" fill="#3D0E26" stroke="#C8AA6E" stroke-width="4" />
+                        <path d="M48 52 L70 42 L130 42 L152 52 Z" fill="#785A28" stroke="#F0E6D2" stroke-width="2" />
+                        <path d="M62 52 L55 95 L63 162" stroke="#C8AA6E" stroke-width="5" />
+                        <path d="M138 52 L145 95 L137 162" stroke="#C8AA6E" stroke-width="5" />
+                        <rect x="30" y="89" width="140" height="12" fill="#785A28" stroke="#F0E6D2" stroke-width="2" />
+                        <polygon points="100,68 122,95 100,132 78,95" fill="#1E2328" stroke="#F0E6D2" stroke-width="3" />
+                        <polygon id="chest-core-gem" points="100,76 114,95 100,122 86,95" fill="#FF69B4" stroke="#FFB6C1" stroke-width="2" />
+                        <polygon points="100,82 107,95 100,112 93,95" fill="#FFB6C1" opacity="0.8" />
+                        <circle cx="100" cy="47" r="3.5" fill="#FF1493" />
+                        <circle cx="85" cy="47" r="2.5" fill="#F472B6" />
+                        <circle cx="115" cy="47" r="2.5" fill="#FBBF24" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Barra de Sobrecarga Hextech (3 Cargas) -->
+            <div class="max-w-xs mx-auto mb-6">
+                <div class="flex justify-between text-xs font-lol text-[#C8AA6E] mb-1.5">
+                    <span>CARGA DEL NÚCLEO HEXTECH</span>
+                    <span id="chest-charge-text" class="text-[#FF69B4] font-bold">0 / 3</span>
+                </div>
+                <div class="w-full h-3 bg-[#1A0510] border border-[#785A28] p-0.5 rounded-sm overflow-hidden">
+                    <div id="chest-charge-bar" class="h-full w-0 bg-gradient-to-r from-[#FF69B4] via-[#FF1493] to-[#F0E6D2] transition-all duration-300 shadow-[0_0_12px_#FF69B4]"></div>
+                </div>
+            </div>
+
+            <button id="unlock-chest-btn" onclick="hitChest()" class="btn-hextech btn-hextech-pink px-8 py-3.5 text-sm sm:text-base rounded-sm">
+                ⚡ DESBLOQUEAR COFRE MAESTRO (TOCAR)
+            </button>
+        </section>
+
+
+        <!-- ==========================================
+             ETAPA 3: REVELACIÓN DE BOTÍN MÍTICO Y VIDEO DE YOUTUBE
+             ========================================== -->
+        <section id="stage-3" class="hidden hextech-panel mythic-card w-full max-w-3xl p-5 sm:p-8 rounded-sm">
+            <div class="corner-ornament corner-tl"></div>
+            <div class="corner-ornament corner-tr"></div>
+            <div class="corner-ornament corner-bl"></div>
+            <div class="corner-ornament corner-br"></div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-between border-b border-[#C8AA6E]/40 pb-3 mb-4 gap-2">
+                <div class="text-center sm:text-left w-full">
+                    <div class="flex items-center justify-center sm:justify-start gap-2">
+                        <span class="inline-block w-2.5 h-2.5 rotate-45 bg-pink-400 shadow-[0_0_8px_#FF1493]"></span>
+                        <span class="text-[11px] uppercase tracking-[0.2em] text-pink-300 font-bold">ASPECTO DEFINITIVO DESBLOQUEADO</span>
+                    </div>
+                    <h2 class="font-lol text-lg sm:text-2xl font-extrabold text-[#F0E6D2] mt-0.5">
+                        ADRIAN & LIA — DÚO ETERNO (EDICIÓN MÍTICA)
+                    </h2>
+                </div>
+            </div>
+
+            <!-- Reproductor de YouTube con Marco Hextech -->
+            <div class="relative bg-black border-2 border-[#C8AA6E] rounded-sm overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.95)] aspect-video mb-2">
+                <iframe
+                    id="youtube-player"
+                    class="w-full h-full"
+                    src=""
+                    title="Video Especial de Adrian para Lia"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen>
+                </iframe>
+            </div>
+
+            <!-- Enlace de respaldo discreto por si el navegador restringe el embed -->
+            <p class="text-center mb-4">
+                <a href="https://youtu.be/RMyieH5x3d0" target="_blank" rel="noopener noreferrer" class="text-[11px] text-[#C8AA6E]/80 hover:text-[#FF69B4] underline transition-colors">
+                    ¿No te carga el video aquí? Ábrelo directamente en YouTube ↗
+                </a>
+            </p>
+
+            <!-- Descripción de Lore del Botín -->
+            <p id="custom-loot-quote" class="text-xs sm:text-sm text-center italic text-[#F0E6D2]/90 bg-[#1A0510]/70 border border-[#785A28]/50 p-3 rounded mb-5">
+                "Ni todas las Rupias de Hyrule, ni todas las estrellas de Dream Land se comparan con haberte encontrado. Este video tiene algo muy importante para ti..."
+            </p>
+
+            <!-- Botón para pasar a la Propuesta Oficial -->
+            <div class="text-center">
+                <button onclick="goToStage4()" class="btn-hextech btn-hextech-pink px-8 py-3.5 text-sm sm:text-base rounded-sm shadow-lg">
+                    RECLAMAR BOTÍN DEFINITIVO ➡️
+                </button>
+            </div>
+        </section>
+
+
+        <!-- ==========================================
+             ETAPA 4: LA PROPUESTA OFICIAL (PACTO DE DÚO)
+             ========================================== -->
+        <section id="stage-4" class="hidden hextech-panel w-full max-w-3xl p-6 sm:p-10 rounded-sm text-center relative overflow-visible">
+            <div class="corner-ornament corner-tl"></div>
+            <div class="corner-ornament corner-tr"></div>
+            <div class="corner-ornament corner-bl"></div>
+            <div class="corner-ornament corner-br"></div>
+
+            <!-- Emblema de Rango Challenger / Mítico -->
+            <div class="relative w-24 h-24 sm:w-28 sm:h-28 mx-auto mb-3 flex items-center justify-center">
+                <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-amber-500/30 via-pink-400/30 to-pink-500/30 blur-xl animate-pulse"></div>
+                <svg class="w-full h-full drop-shadow-[0_0_15px_rgba(200,170,110,0.8)]" viewBox="0 0 120 120" fill="none">
+                    <path d="M60 12 L85 30 L108 20 L96 55 L112 75 L82 88 L60 110 L38 88 L8 75 L24 55 L12 20 L35 30 Z" fill="#1E2328" stroke="#C8AA6E" stroke-width="3"/>
+                    <polygon points="60,22 80,45 60,96 40,45" fill="#FF69B4" stroke="#F0E6D2" stroke-width="2"/>
+                    <path d="M60 72l-2.2-2C49 62 44 57.5 44 51.8 44 47.2 47.6 43.5 52.2 43.5c2.6 0 5.1 1.2 6.8 3.1 1.7-1.9 4.2-3.1 6.8-3.1 4.6 0 8.2 3.7 8.2 8.3 0 5.7-5 10.2-13.8 18.2L60 72z" fill="#FF1493" stroke="#FFFFFF" stroke-width="1.5"/>
+                </svg>
+            </div>
+
+            <p class="text-xs uppercase tracking-[0.28em] text-[#FF69B4] font-bold mb-1">PACTO DE DÚO DEFINITIVO // RANGO MÍTICO</p>
+            <h1 id="proposal-headline" class="font-lol text-2xl sm:text-4xl font-black text-[#F0E6D2] drop-shadow-[0_4px_15px_rgba(200,170,110,0.5)] mb-3 leading-tight">
+                LIA, ¿QUIERES SER MI NOVIA OFICIALMENTE?
+            </h1>
+            <p id="proposal-subtext" class="text-xs sm:text-base text-[#C8AA6E] max-w-xl mx-auto mb-8 leading-relaxed">
+                Te amo tanto mi vida, y quiero que este sea nuestro pacto eterno. Si aceptas, prometo cuidarte, apoyarte y amarte todos los días de nuestras vidas. 💖
+            </p>
+
+            <!-- Botones de Decisión -->
+            <div class="relative min-h-[90px] flex flex-wrap items-center justify-center gap-6 my-2">
+                <button onclick="acceptProposal()" class="btn-hextech btn-hextech-pink px-7 py-4 text-sm sm:text-lg rounded-sm shadow-[0_0_25px_rgba(255,105,180,0.6)] flex items-center gap-2 z-20">
+                    <span>💖 ACEPTAR PACTO (¡SÍ, OBVIO!)</span>
+                </button>
+
+                <button id="btn-no-flash" class="btn-hextech px-5 py-3.5 text-xs sm:text-sm rounded-sm border-red-500/70 text-red-200 flex items-center gap-2 z-30">
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded bg-amber-400/20 border border-amber-300 text-amber-300 text-xs">⚡</span>
+                    <span>RECHAZAR (NO)</span>
+                </button>
+            </div>
+
+            <!-- Mini Chat de Sistema de League of Legends -->
+            <div class="mt-6 max-w-lg mx-auto bg-[#1A0510]/95 border border-[#785A28]/70 rounded p-3 text-left font-mono text-xs">
+                <div class="flex items-center justify-between border-b border-[#785A28]/40 pb-1 mb-2 text-[10px] text-[#C8AA6E]">
+                    <span>REGISTRO DE CHAT // GRIETA DEL CORAZÓN</span>
+                    <span class="text-[#FF69B4]">● En línea</span>
+                </div>
+                <div id="lol-chat-log" class="space-y-1 max-h-24 overflow-y-auto text-[11px] leading-relaxed">
+                    <p><span class="text-amber-400">[Sistema]:</span> ¡Se ha iniciado una votación de Pacto Eterno entre <span class="text-[#FF69B4] font-semibold">Adrian</span> y <span class="text-pink-400 font-semibold">Lia</span>!</p>
+                    <p><span class="text-pink-400">[Bardo Cósmico]:</span> El destino Mítico aguarda tu respuesta...</p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==========================================
+             PANTALLA DE VICTORIA + CERTIFICADO DE DÚO
+             ========================================== -->
+        <section id="stage-victory" class="hidden hextech-panel w-full max-w-3xl p-6 sm:p-10 rounded-sm text-center">
+            <div class="corner-ornament corner-tl"></div>
+            <div class="corner-ornament corner-tr"></div>
+            <div class="corner-ornament corner-bl"></div>
+            <div class="corner-ornament corner-br"></div>
+
+            <div class="mb-4">
+                <span class="inline-block px-3 py-1 rounded-full bg-pink-950 border border-pink-400 text-pink-200 text-[11px] font-semibold tracking-widest uppercase mb-2">
+                    ¡NUEVO RANGO DESBLOQUEADO: NOVIOS OFICIALES!
+                </span>
+                <h1 class="font-lol text-4xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-[#FFFDF5] via-[#F0E6D2] to-[#C89B3C] drop-shadow-[0_4px_25px_rgba(200,155,60,0.9)] tracking-widest">
+                    ¡VICTORIA!
+                </h1>
+            </div>
+
+            <!-- Certificado Oficial de Dúo Imprimible / Guardable -->
+            <div id="duo-certificate" class="bg-gradient-to-b from-[#2D0A1C] to-[#1A0510] border-2 border-[#C8AA6E] p-5 sm:p-7 rounded-sm my-5 relative text-center shadow-[inset_0_0_30px_rgba(200,170,110,0.18)]">
+                <div class="border border-[#785A28]/70 p-4 sm:p-6">
+                    <p class="font-lol text-[10px] sm:text-xs tracking-[0.3em] text-[#FF69B4] uppercase mb-1">
+                        CERTIFICADO OFICIAL DE ARTESANÍA HEXTECH
+                    </p>
+                    <h2 class="font-lol text-xl sm:text-2xl font-bold text-[#F0E6D2] border-b border-[#785A28]/60 pb-3 mb-4">
+                        PACTO DE DÚO ETERNO
+                    </h2>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 items-center gap-4 my-4">
+                        <div class="bg-[#1A0510]/80 border border-[#785A28] p-3 rounded">
+                            <p class="text-[10px] text-[#C8AA6E] uppercase">Invocadora Mítica</p>
+                            <p class="font-lol text-lg font-bold text-pink-400 mt-0.5">LIA 🌸</p>
+                            <p class="text-[10px] text-slate-400">Main Princesa de Hyrule & Kirby</p>
+                        </div>
+
+                        <div class="flex flex-col items-center justify-center">
+                            <div class="w-12 h-12 rounded-full bg-pink-950/80 border-2 border-[#C8AA6E] flex items-center justify-center text-xl shadow-[0_0_15px_#FF1493]">
+                                💖
+                            </div>
+                            <span class="text-[10px] text-[#FF69B4] font-lol mt-1 font-bold">SINERGIA 100%</span>
+                        </div>
+
+                        <div class="bg-[#1A0510]/80 border border-[#785A28] p-3 rounded">
+                            <p class="text-[10px] text-[#C8AA6E] uppercase">Invocador & Dúo</p>
+                            <p class="font-lol text-lg font-bold text-[#FF69B4] mt-0.5">ADRIAN ⚔️</p>
+                            <p class="text-[10px] text-slate-400">Soporte & Compañero Oficial</p>
+                        </div>
+                    </div>
+
+                    <p class="text-xs sm:text-sm text-[#F0E6D2]/90 italic max-w-lg mx-auto my-3 leading-relaxed">
+                        "Gracias mi amor por darme esta oportunidad, te cuidare y te protegere siempre, Te amo con todo mi corazon"
+                    </p>
+
+                    <div class="flex flex-wrap items-center justify-between text-[11px] text-[#C8AA6E] border-t border-[#785A28]/50 pt-3 mt-4 gap-2">
+                        <span>FECHA DEL PACTO: <strong id="cert-date" class="text-[#F0E6D2]">HOY</strong></span>
+                        <span>SERVIDOR: <strong class="text-[#FF69B4]">CORAZÓN DE LIA #01</strong></span>
+                        <span>ESTADO: <strong class="text-green-400">ACTIVO PARA SIEMPRE</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="no-print flex flex-wrap justify-center gap-4 mt-6">
+                <button onclick="celebrateMoreConfetti()" class="btn-hextech btn-hextech-pink px-6 py-3 text-xs sm:text-sm rounded-sm">
+                    🎉 LANZAR MÁS MAGIA HEXTECH
+                </button>
+                <button onclick="window.print()" class="btn-hextech px-6 py-3 text-xs sm:text-sm rounded-sm">
+                    🖨️ GUARDAR / IMPRIMIR CERTIFICADO
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="relative z-10 text-center py-2 text-[11px] text-[#C8AA6E]/70 border-t border-[#785A28]/30 bg-[#1A0510]/80">
+        Artesanía Hextech Personalizada con 💖 por Adrian para Lia // Zelda • Kirby • BTS • LoL
+    </footer>
+
+    <!-- ==========================================
+         LÓGICA COMPLETA: AUDIO, TRIVIA, COFRE, YOUTUBE Y PROPUESTA
+         ========================================== -->
+    <script>
+        /* ==========================================================
+           0. CONFIGURACIÓN DEL VIDEO DE YOUTUBE
+           ========================================================== */
+        const YOUTUBE_VIDEO_ID = 'RMyieH5x3d0';
+        const YOUTUBE_EMBED_URL = `https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?rel=0&modestbranding=1`;
+
+        /* ==========================================================
+           1. SINTETIZADOR DE SONIDO HEXTECH (WEB AUDIO API)
+           ========================================================== */
+        let audioCtx = null;
+        let isMuted = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function toggleAudio() {
+            isMuted = !isMuted;
+            document.getElementById('audio-icon').textContent = isMuted ? '🔇' : '🔊';
+            if (!isMuted) playHextechSound('click');
+        }
+
+        function playHextechSound(type, step = 1) {
+            if (isMuted) return;
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+
+                if (type === 'click') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(1100, now);
+                    osc.frequency.exponentialRampToValueAtTime(420, now + 0.06);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.065);
+                } 
+                else if (type === 'forge') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, i) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + i * 0.08);
+                        gain.gain.setValueAtTime(0.15, now + i * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.45);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + i * 0.08);
+                        osc.stop(now + i * 0.08 + 0.46);
+                    });
+                }
+                else if (type === 'wrong') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(170, now);
+                    osc.frequency.linearRampToValueAtTime(115, now + 0.22);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                }
+                else if (type === 'charge') {
+                    const baseFreq = 240 + (step * 140);
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(baseFreq, now);
+                    osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.6, now + 0.35);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.36);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.38);
+                }
+                else if (type === 'chestOpen') {
+                    const chord = [261.63, 329.63, 392.00, 523.25, 659.25, 1046.50];
+                    chord.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = idx % 2 === 0 ? 'triangle' : 'sine';
+                        osc.frequency.setValueAtTime(freq * 0.5, now);
+                        osc.frequency.exponentialRampToValueAtTime(freq, now + 0.18);
+                        gain.gain.setValueAtTime(0.14, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.3);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now);
+                        osc.stop(now + 1.35);
+                    });
+                }
+                else if (type === 'flash') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(900, now);
+                    osc.frequency.exponentialRampToValueAtTime(2400, now + 0.14);
+                    gain.gain.setValueAtTime(0.16, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.17);
+                }
+                else if (type === 'victory') {
+                    const melody = [
+                        { f: 523.25, t: 0, d: 0.18 },
+                        { f: 659.25, t: 0.18, d: 0.18 },
+                        { f: 783.99, t: 0.36, d: 0.18 },
+                        { f: 1046.50, t: 0.54, d: 0.65 }
+                    ];
+                    melody.forEach(n => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(n.f, now + n.t);
+                        gain.gain.setValueAtTime(0.2, now + n.t);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + n.t + n.d);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + n.t);
+                        osc.stop(now + n.t + n.d + 0.05);
+                    });
+                }
+            } catch (e) {}
+        }
+
+
+        /* ==========================================================
+           2. PREGUNTAS PERSONALIZADAS
+           ========================================================== */
+        const QUESTIONS = [
+            {
+                fragmentName: "Fragmento de la Trifuerza 🔺",
+                question: "¿Cuál es mi personaje favorito?",
+                options: [
+                    "Godzilla",
+                    "Deadpool",
+                    "Dinosaurios",
+                    "Gojo"
+                ],
+                correct: 0
+            },
+            {
+                fragmentName: "Fragmento Estelar Poyo ⭐",
+                question: "Si estuviéramos jugando League of Legends, ¿qué es lo primero que dices?",
+                options: [
+                    "Te voy a carrear",
+                    "Te voy a bloquear",
+                    "Me insultarías y me dirías: ¡ACTIVA EL 2 ADRIAN, ADRIAN, ACTIVA EL 2!!!!",
+                    "Desinstala el juego y dedícate a otra cosa"
+                ],
+                correct: 2
+            },
+            {
+                fragmentName: "Fragmento Cristal Borahae 💖",
+                question: "¿Qué es lo que más me importa en este mundo?",
+                options: [
+                    "Mi PC",
+                    "Tú y solamente tú (los videojuegos también me gustan, pero no tanto como tú)",
+                    "Comer hamburguesa y papitas",
+                    "Molestarte y hacerte la vida imposible"
+                ],
+                correct: 1
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let isAnswering = false;
+
+        /* ==========================================================
+           3. LÓGICA DE LA ETAPA 1 (FORJA DE FRAGMENTOS DE LLAVE)
+           ========================================================== */
+        function renderQuestion() {
+            if (currentQuestionIndex >= QUESTIONS.length) {
+                setTimeout(() => {
+                    jumpToStage(2);
+                }, 600);
+                return;
+            }
+
+            const qData = QUESTIONS[currentQuestionIndex];
+            document.getElementById('question-counter').textContent = `MISIÓN DE FORJA ${currentQuestionIndex + 1} DE ${QUESTIONS.length}`;
+            document.getElementById('question-tag').textContent = `Forjando: ${qData.fragmentName}`;
+            document.getElementById('question-title').textContent = qData.question;
+            document.getElementById('quiz-feedback').innerHTML = '';
+
+            const optionsList = document.getElementById('options-list');
+            optionsList.innerHTML = '';
+
+            qData.options.forEach((optText, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option w-full p-3.5 rounded-sm text-xs sm:text-sm font-medium flex items-center gap-3';
+                btn.innerHTML = `
+                    <span class="w-6 h-6 rounded-full border border-[#C8AA6E] bg-[#010A13] flex items-center justify-center font-lol text-xs text-[#C8AA6E] shrink-0">
+                        ${['A', 'B', 'C', 'D'][idx]}
+                    </span>
+                    <span class="flex-1">${optText}</span>
+                `;
+                btn.onclick = () => selectAnswer(idx, btn);
+                optionsList.appendChild(btn);
+            });
+            isAnswering = false;
+        }
+
+        function selectAnswer(selectedIndex, btnEl) {
+            if (isAnswering) return;
+            const qData = QUESTIONS[currentQuestionIndex];
+            const feedbackEl = document.getElementById('quiz-feedback');
+
+            if (selectedIndex === Number(qData.correct)) {
+                isAnswering = true;
+                btnEl.classList.add('correct');
+                playHextechSound('forge');
+                unlockFragmentVisual(currentQuestionIndex);
+
+                feedbackEl.innerHTML = `<span class="text-[#FF69B4] font-semibold">✨ ¡Misión completada! Has forjado el ${qData.fragmentName}</span>`;
+
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    renderQuestion();
+                }, 1300);
+            } else {
+                btnEl.classList.add('wrong');
+                playHextechSound('wrong');
+                feedbackEl.innerHTML = `<span class="text-red-400">⚠️ Esa opción no tiene suficiente Esencia Mítica. ¡Intenta con otra!</span>`;
+                setTimeout(() => {
+                    btnEl.classList.remove('wrong');
+                }, 650);
+            }
+        }
+
+        function unlockFragmentVisual(index) {
+            const slot = document.getElementById(`frag-slot-${index}`);
+            const icon = document.getElementById(`frag-icon-${index}`);
+            const status = document.getElementById(`frag-status-${index}`);
+
+            if (slot && icon && status) {
+                slot.classList.add('unlocked', 'bg-[#2D0A1C]/90', 'border-[#FF69B4]/60');
+                icon.classList.remove('opacity-40');
+                icon.classList.add('border-[#FF69B4]', 'shadow-[0_0_15px_#FF69B4]');
+                status.textContent = '¡FORJADO!';
+                status.className = 'text-[9px] uppercase tracking-wider mt-1 px-2 py-0.5 rounded bg-pink-950 text-[#FF69B4] border border-[#FF69B4]/50 font-bold';
+            }
+        }
+
+
+        /* ==========================================================
+           4. LÓGICA DE LA ETAPA 2 (COFRE MAESTRO HEXTECH)
+           ========================================================== */
+        let chestHits = 0;
+        const REQUIRED_HITS = 3;
+
+        function hitChest() {
+            if (chestHits >= REQUIRED_HITS) return;
+            chestHits++;
+
+            playHextechSound('charge', chestHits);
+
+            const wrapper = document.getElementById('main-stage-wrapper');
+            wrapper.classList.remove('animate-screen-shake');
+            void wrapper.offsetWidth;
+            wrapper.classList.add('animate-screen-shake');
+
+            const pct = Math.min(100, Math.round((chestHits / REQUIRED_HITS) * 100));
+            document.getElementById('chest-charge-bar').style.width = `${pct}%`;
+            document.getElementById('chest-charge-text').textContent = `${chestHits} / ${REQUIRED_HITS}`;
+
+            const aura = document.getElementById('chest-aura');
+            const coreGem = document.getElementById('chest-core-gem');
+            if (chestHits === 1) {
+                aura.className = 'absolute w-52 h-52 rounded-full bg-pink-400/35 blur-2xl transition-all duration-300';
+                document.getElementById('unlock-chest-btn').textContent = '⚡ SOBRECARGANDO NÚCLEO (2 TOQUES MÁS)';
+            } else if (chestHits === 2) {
+                aura.className = 'absolute w-64 h-64 rounded-full bg-pink-500/50 blur-3xl transition-all duration-300';
+                coreGem.setAttribute('fill', '#FF1493');
+                document.getElementById('unlock-chest-btn').textContent = '🔥 ¡ÚLTIMO TOQUE PARA ABRIR EL COFRE!';
+            } else if (chestHits === 3) {
+                document.getElementById('unlock-chest-btn').textContent = '✨ ¡ABRIENDO BOTÍN MÍTICO!';
+                setTimeout(() => {
+                    triggerChestBurst();
+                }, 350);
+            }
+        }
+
+        function triggerChestBurst() {
+            playHextechSound('chestOpen');
+
+            const flashOverlay = document.getElementById('white-flash-overlay');
+            flashOverlay.style.opacity = '1';
+
+            confetti({
+                particleCount: 90,
+                spread: 100,
+                origin: { y: 0.55 },
+                colors: ['#FF69B4', '#C8AA6E', '#FF1493', '#F0E6D2']
+            });
+
+            setTimeout(() => {
+                // Cargar el iframe de YouTube justo al revelar el botín
+                document.getElementById('youtube-player').src = YOUTUBE_EMBED_URL;
+                jumpToStage(3);
+                flashOverlay.style.opacity = '0';
+            }, 650);
+        }
+
+
+        /* ==========================================================
+           5. LÓGICA DE LA ETAPA 3 (VIDEO DE YOUTUBE)
+           ========================================================== */
+        function goToStage4() {
+            playHextechSound('click');
+            // Detener por completo el video de YouTube al avanzar a la propuesta
+            const ytPlayer = document.getElementById('youtube-player');
+            if (ytPlayer) ytPlayer.src = '';
+            jumpToStage(4);
+        }
+
+
+        /* ==========================================================
+           6. LÓGICA DE LA ETAPA 4 (PROPUESTA OFICIAL Y BOTÓN DESTELLO)
+           ========================================================== */
+        const btnNoFlash = document.getElementById('btn-no-flash');
+        const lolChatLog = document.getElementById('lol-chat-log');
+        let flashCount = 0;
+
+        const lolFlashMessages = [
+            "⚡ <span class='text-[#FF69B4]'>Adrian</span> usó <strong>Destello (Flash)</strong> en el botón 'No' (Enfriamiento: 300s).",
+            "🛡️ <span class='text-amber-400'>[Sistema Riot Games]:</span> El botón 'No' es inmune a clics porque Lia y Adrian son el dúo perfecto.",
+            "✨ <span class='text-pink-400'>[Kirby]:</span> ¡Poyo! Kirby absorbió la opción de decir que No.",
+            "🔺 <span class='text-green-400'>[Princesa Zelda]:</span> La Sabiduría de la Trifuerza indica que la respuesta correcta es '¡SÍ, OBVIO!'.",
+            "💖 <span class='text-pink-400'>[BTS Army Bot]:</span> Error Borahae 404: Imposible rechazar a tu soporte favorito.",
+            "⏳ <span class='text-amber-300'>[Reloj de Arena de Zhonya]:</span> El botón 'No' entró en estasis dorada."
+        ];
+
+        function triggerNoButtonFlash(e) {
+            if (e) e.preventDefault();
+            playHextechSound('flash');
+
+            const rect = btnNoFlash.getBoundingClientRect();
+            const oldX = rect.left + rect.width / 2;
+            const oldY = rect.top + rect.height / 2;
+
+            const puff = document.createElement('div');
+            puff.className = 'flash-puff';
+            puff.style.left = `${oldX}px`;
+            puff.style.top = `${oldY}px`;
+            document.body.appendChild(puff);
+            setTimeout(() => puff.remove(), 600);
+
+            // Asegurar que el botón flote sobre toda la ventana sin quedar cortado
+            if (btnNoFlash.parentElement !== document.body) {
+                document.body.appendChild(btnNoFlash);
+            }
+
+            const pad = 24;
+            const maxX = Math.max(pad, window.innerWidth - rect.width - pad);
+            const maxY = Math.max(pad, window.innerHeight - rect.height - pad);
+
+            const newX = Math.floor(Math.random() * (maxX - pad)) + pad;
+            const newY = Math.floor(Math.random() * (maxY - pad)) + pad;
+
+            btnNoFlash.style.position = 'fixed';
+            btnNoFlash.style.left = `${newX}px`;
+            btnNoFlash.style.top = `${newY}px`;
+            btnNoFlash.style.zIndex = '50';
+
+            const msg = lolFlashMessages[flashCount % lolFlashMessages.length];
+            flashCount++;
+            const p = document.createElement('p');
+            p.innerHTML = msg;
+            lolChatLog.appendChild(p);
+            lolChatLog.scrollTop = lolChatLog.scrollHeight;
+        }
+
+        btnNoFlash.addEventListener('mouseenter', triggerNoButtonFlash);
+        btnNoFlash.addEventListener('touchstart', triggerNoButtonFlash, { passive: false });
+        btnNoFlash.addEventListener('click', triggerNoButtonFlash);
+
+        function acceptProposal() {
+            playHextechSound('victory');
+            btnNoFlash.style.display = 'none';
+
+            const now = new Date();
+            document.getElementById('cert-date').textContent = now.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            }).toUpperCase();
+
+            jumpToStage('victory');
+            celebrateMoreConfetti();
+        }
+
+        function celebrateMoreConfetti() {
+            playHextechSound('forge');
+            const duration = 4500;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 6,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0, y: 0.65 },
+                    colors: ['#C8AA6E', '#FF69B4', '#FF1493', '#F472B6']
+                });
+                confetti({
+                    particleCount: 6,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1, y: 0.65 },
+                    colors: ['#C8AA6E', '#FF69B4', '#FF1493', '#F472B6']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            })();
+        }
+
+
+        /* ==========================================================
+           7. NAVEGACIÓN ENTRE ETAPAS
+           ========================================================== */
+        function jumpToStage(stageId) {
+            ['1', '2', '3', '4', 'victory'].forEach(id => {
+                const el = document.getElementById(`stage-${id}`);
+                if (el) el.classList.add('hidden');
+            });
+            const target = document.getElementById(`stage-${stageId}`);
+            if (target) target.classList.remove('hidden');
+        }
+
+
+        /* ==========================================================
+           8. SISTEMA DE PARTÍCULAS AMBIENTALES HEXTECH (CANVAS)
+           ========================================================== */
+        const canvas = document.getElementById('hextech-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class HextechSpark {
+            constructor() {
+                this.reset();
+                this.y = Math.random() * canvas.height;
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + 10;
+                this.size = Math.random() * 2.4 + 0.8;
+                this.speedY = -(Math.random() * 0.7 + 0.25);
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.alpha = Math.random() * 0.65 + 0.2;
+                const palette = ['#FF69B4', '#C8AA6E', '#FF1493', '#F0E6D2', '#FFB6C1'];
+                this.color = palette[Math.floor(Math.random() * palette.length)];
+            }
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                if (this.y < -10) this.reset();
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function initParticles() {
+            resizeCanvas();
+            particles = Array.from({ length: 55 }, () => new HextechSpark());
+            animateParticles();
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        window.onload = function () {
+            initParticles();
+            renderQuestion();
+        };
+    </script>
+</body>
+</html>
